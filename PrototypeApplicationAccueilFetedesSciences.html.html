@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang='fr'>
+<head>
+<meta charset='utf-8' />
+<meta name='viewport' content='width=device-width, initial-scale=1' />
+<title>Accueil — Fête des Sciences (v5 • Thème clair affiné)</title>
+<link rel='preconnect' href='https://fonts.gstatic.com' crossorigin>
+<link href='https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap' rel='stylesheet'>
+<style>
+  :root{--bg:#f6f8fc;--panel:#ffffff;--panel-2:#fbfdff;--text:#0f172a;--muted:#5b6476;--border:#e7ecf3;
+        --primary:#2563eb;--primary-600:#1d4ed8;--primary-700:#1e40af;--chip:#eef2ff;--chip-border:#dbe3ff;
+        --success:#16a34a;--danger:#ef4444;--shadow:0 10px 30px rgba(22,39,75,.08);--shadow-2:0 10px 30px rgba(22,39,75,.12)}
+  *{box-sizing:border-box} body{margin:0;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell,'Noto Sans',sans-serif;
+    background:radial-gradient(900px 500px at -10% -10%, rgba(37,99,235,.08) 0%, transparent 60%),radial-gradient(1000px 600px at 110% 0%, rgba(147,51,234,.06) 0%, transparent 60%),var(--bg);color:var(--text)}
+  .wrap{max-width:1200px;margin:0 auto;padding:28px}
+  header{position:sticky;top:0;background:rgba(255,255,255,.92);backdrop-filter:saturate(130%) blur(8px);border-bottom:1px solid var(--border);z-index:10;box-shadow:0 2px 12px rgba(24,39,75,.05)}
+  header .inner{max-width:1200px;margin:0 auto;padding:14px 28px;display:flex;align-items:center;justify-content:space-between}
+  h1{margin:0;font-size:clamp(20px,3vw,28px)} .badge{background:#eef2ff;border:1px solid #e0e7ff;padding:6px 10px;border-radius:999px;color:#334155;font-weight:600}
+  .kpi{display:grid;gap:16px;grid-template-columns:repeat(3,minmax(0,1fr));margin-top:18px}
+  .kpi .card{padding:18px;border-radius:16px;background:var(--panel);border:1px solid var(--border);box-shadow:var(--shadow)}
+  .kpi .lbl{color:var(--muted);font-weight:600} .kpi .val{margin-top:8px;font-size:34px;font-weight:800}
+  .kpi .danger{box-shadow:inset 0 0 0 2px var(--danger), var(--shadow)} .kpi .note{margin-top:6px;color:#b91c1c;display:flex;gap:6px;font-weight:600}
+  .grid{display:grid;gap:18px;margin-top:18px} @media(min-width:1000px){.grid{grid-template-columns:1fr 1fr}}
+  .card{padding:20px;border-radius:18px;background:var(--panel);border:1px solid var(--border);box-shadow:var(--shadow)}
+  .card h3{margin:0 0 12px;font-size:18px}
+  .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+  .chip{background:var(--chip);border:1px solid var(--chip-border);padding:12px 14px;border-radius:12px;cursor:pointer;min-width:48px;text-align:center;font-weight:800;color:#1e293b;transition:transform .12s ease, box-shadow .12s ease;background-image:linear-gradient(#f7f9ff,#eef4ff)}
+  .chip:hover{transform:translateY(-1px); box-shadow:0 0 0 1px var(--primary) inset}
+  .btn{border:1px solid #e5e7eb;background:#fff;color:#0f172a;padding:12px 16px;border-radius:12px;cursor:pointer;font-weight:700;box-shadow:var(--shadow);transition:transform .12s ease, box-shadow .12s ease}
+  .btn:hover{transform:translateY(-1px);box-shadow:var(--shadow-2)} .btn.primary{background:linear-gradient(180deg,#3b82f6,#2563eb);border-color:#1d4ed8;color:#fff}
+  .btn.success{background:linear-gradient(180deg,#22c55e,#16a34a);border-color:#16a34a;color:#fff} .btn.danger{background:linear-gradient(180deg,#f87171,#ef4444);border-color:#ef4444;color:#fff}
+  input[type='number'],input[type='text']{background:#fff;color:#0f172a;border:1px solid var(--border);border-radius:12px;padding:12px 14px;box-shadow:var(--shadow)}
+  .bar{height:12px;background:#eef2ff;border-radius:8px;overflow:hidden;box-shadow:inset 0 0 0 1px #e0e7ff}
+  .bar>span{display:block;height:100%;background:linear-gradient(90deg,#93c5fd,#3b82f6);transition:width .25s ease}
+  .muted{color:#5b6476} .toolbar{display:flex;gap:10px;flex-wrap:wrap;justify-content:flex-end;margin-top:12px}
+  .hours{display:grid;grid-template-columns:repeat(1,minmax(0,1fr));gap:10px} .hours .row{align-items:center}
+  .hours .label{width:44px;color:#475569} .hours .value{width:48px;text-align:right;font-weight:800;color:#0f172a}
+</style>
+</head>
+<body>
+<header><div class='inner'><h1>Accueil — Fête des Sciences</h1><span class='badge'>Mode local / hors‑ligne</span></div></header>
+<div class='wrap'>
+  <div class='kpi'>
+    <div class='card' id='kpiTotalBox'><div class='lbl'>Total visiteurs</div><div class='val' id='kpiTotal'>0</div><div class='note' id='kpiWarn' style='display:none'>⚠️ Seuil 700 dépassé</div></div>
+    <div class='card'><div class='lbl'>Somme par départements</div><div class='val' id='kpiDeptSum'>0</div></div>
+    <div class='card'><div class='lbl'>Écart (Total − Somme dép.)</div><div class='val' id='kpiGap'>0</div></div>
+  </div>
+
+  <div class='grid'>
+    <div class='card'>
+      <h3>1) Ajouter des personnes au total</h3>
+      <div class='row' id='rowNumbers'></div>
+      <div class='row'>
+        <input type='number' id='freeNumber' placeholder='Autre nombre (ex. 26)' min='1' style='max-width:240px' />
+        <button class='btn primary' id='btnAddFree'>Ajouter au total</button>
+      </div>
+      <p class='muted'>Indépendant des départements (sert au compteur global).</p>
+    </div>
+
+    <div class='card'>
+      <h3>2) Ajouter une ligne département + nombre</h3>
+      <div class='row' id='rowPriority'></div>
+      <div class='row'>
+        <input type='text' id='deptInput' placeholder='Département (91, 2A, 974…)' style='max-width:240px' />
+        <input type='number' id='deptCount' placeholder='Nombre' min='1' style='max-width:160px' />
+        <button class='btn success' id='btnAddDeptLine'>Ajouter la ligne</button>
+      </div>
+      <div class='row'>
+        <span class='muted'>Ajout rapide pour le département sélectionné :</span>
+        <button class='btn' data-inc='1'>+1</button>
+        <button class='btn' data-inc='2'>+2</button>
+        <button class='btn' data-inc='3'>+3</button>
+        <button class='btn' data-inc='4'>+4</button>
+        <button class='btn' data-inc='5'>+5</button>
+      </div>
+      <p class='muted'>Ex : cliquer 91 puis +3 → ajoute immédiatement « 3 personnes du 91 ».</p>
+    </div>
+  </div>
+
+  <div class='grid'>
+    <div class='card'>
+      <div class='toolbar'>
+        <button class='btn' id='btnExport'>Exporter CSV</button>
+        <button class='btn danger' id='btnReset'>Réinitialiser</button>
+      </div>
+      <h3>Totaux par département</h3>
+      <div id='totalsContainer'></div>
+    </div>
+    <div class='card'>
+      <h3>Répartition horaire (visiteurs par heure)</h3>
+      <div class='hours' id='hourBars'></div>
+      <p class='muted'>Basé uniquement sur les lignes « département + nombre » (le compteur global n’influe pas ce graphe).</p>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+  const PRIORITY=["77","78","91","92","75","28","94"];
+  let totalGlobal=loadLS('fds_total_v5_light_ui2',0);
+  let entries=loadLS('fds_entries_v5_light_ui2',[]);
+  let totalsDept=loadLS('fds_totalsDept_v5_light_ui2',{});
+  let hours=loadLS('fds_hours_v5_light_ui2',{});
+
+  const rowNumbers=qs('#rowNumbers'); const rowPriority=qs('#rowPriority');
+  const totalsContainer=qs('#totalsContainer'); const hourBars=qs('#hourBars');
+
+  for(let i=1;i<=12;i++){ const b=chip(String(i)); b.onclick=()=>addToTotal(i); rowNumbers.appendChild(b); }
+  PRIORITY.forEach(c=>{ const b=chip(c); b.onclick=()=>{ qs('#deptInput').value=c; }; rowPriority.appendChild(b); });
+
+  on('#btnAddFree','click',()=>{ const n=parseInt(qs('#freeNumber').value,10); if(Number.isFinite(n)&&n>0){ addToTotal(n); qs('#freeNumber').value=''; } });
+  on('#btnAddDeptLine','click',()=> addDeptLineFromInputs());
+
+  document.querySelectorAll('[data-inc]').forEach(btn=>{
+    btn.addEventListener('click',()=>{
+      const dept = qs('#deptInput').value.trim().toUpperCase();
+      const inc = parseInt(btn.getAttribute('data-inc'),10);
+      if(!dept){ alert('Sélectionne d\'abord un département.'); return; }
+      addDeptLine(dept, inc);
+    });
+  });
+
+  on('#btnExport','click',exportCSV);
+  on('#btnReset','click',()=>{ if(confirm('Tout effacer ?')){ totalGlobal=0; entries=[]; totalsDept={}; hours={}; saveAll(); renderAll(); }});
+
+  function addDeptLineFromInputs(){
+    const dept=qs('#deptInput').value.trim().toUpperCase();
+    const n=parseInt(qs('#deptCount').value,10);
+    if(!dept || !Number.isFinite(n) || n<=0) return;
+    addDeptLine(dept, n);
+    qs('#deptInput').value=''; qs('#deptCount').value='';
+  }
+
+  function addDeptLine(dept, n){
+    const ts=Date.now();
+    entries.unshift({ts,type:'dept',dept,count:n});
+    totalsDept[dept]=(totalsDept[dept]||0)+n;
+    bumpHour(n); // only dept lines affect hour chart
+    saveAll(); renderAll();
+  }
+
+  function addToTotal(n){
+    const ts=Date.now();
+    totalGlobal+=n;
+    entries.unshift({ts,type:'global',count:n});
+    saveAll(); renderAll();
+  }
+
+  function bumpHour(n){
+    const hh=String(new Date().getHours()).padStart(2,'0');
+    hours[hh]=(hours[hh]||0)+n;
+  }
+
+  function renderKPI(){
+    qs('#kpiTotal').textContent=totalGlobal;
+    const sumDept=Object.values(totalsDept).reduce((a,b)=>a+b,0);
+    qs('#kpiDeptSum').textContent=sumDept;
+    qs('#kpiGap').textContent=totalGlobal-sumDept;
+    const box=qs('#kpiTotalBox'); const warn=document.getElementById('kpiWarn');
+    if(totalGlobal>700){ box.classList.add('danger'); warn.style.display='block'; } else { box.classList.remove('danger'); warn.style.display='none'; }
+  }
+
+  function renderTotalsDept(){
+    const arr=Object.entries(totalsDept).sort((a,b)=>a[0].localeCompare(b[0]));
+    if(arr.length===0){ totalsContainer.innerHTML='<p class="muted">Aucune ligne département.</p>'; return; }
+    const max=Math.max(...arr.map(([_,v])=>v)); const frag=document.createDocumentFragment();
+    arr.forEach(([d,v])=>{
+      const row=document.createElement('div'); row.className='row'; row.style.alignItems='center';
+      row.innerHTML=`<div style='width:60px'><b>${d}</b></div>
+        <div class='bar' style='flex:1'><span style='width:${(v/max*100).toFixed(1)}%'></span></div>
+        <div style='width:60px;text-align:right'><b>${v}</b></div>`;
+      frag.appendChild(row);
+    });
+    totalsContainer.innerHTML=''; totalsContainer.appendChild(frag);
+  }
+
+  function renderHours(){
+    const hoursList=['08','09','10','11','12','13','14','15','16','17','18','19','20'];
+    const max=Math.max(1,...hoursList.map(h=>hours[h]||0));
+    const frag=document.createDocumentFragment();
+    hoursList.forEach(h=>{
+      const v=hours[h]||0;
+      const ratio=v/max; const hue=215-Math.round(120*ratio); const color=`hsl(${hue},85%,55%)`;
+      const row=document.createElement('div'); row.className='row';
+      row.innerHTML=`<div class='label'>${h}h</div>
+        <div class='bar' style='flex:1'><span style='width:${(v/max*100).toFixed(1)}%; background:${color}'></span></div>
+        <div class='value'>${v}</div>`;
+      frag.appendChild(row);
+    });
+    hourBars.innerHTML=''; hourBars.appendChild(frag);
+  }
+
+  function exportCSV(){
+    const header=['timestamp','type','dept','count'];
+    const body=entries.map(r=>[new Date(r.ts).toISOString(),r.type,r.dept||'',r.count]);
+    const csv=[header,...body].map(x=>x.join(',')).join('\n');
+    const a=document.createElement('a'); a.href='data:text/csv;charset=utf-8,'+encodeURIComponent(csv);
+    a.download='fds-local-v5-light-ui2-'+new Date().toISOString().slice(0,10)+'.csv';
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  }
+
+  function saveAll(){ saveLS('fds_total_v5_light_ui2',totalGlobal); saveLS('fds_entries_v5_light_ui2',entries); saveLS('fds_totalsDept_v5_light_ui2',totalsDept); saveLS('fds_hours_v5_light_ui2',hours); }
+  function renderAll(){ renderKPI(); renderTotalsDept(); renderHours(); }
+
+  function qs(s,r=document){return r.querySelector(s)} function on(sel,ev,fn){qs(sel).addEventListener(ev,fn)}
+  function chip(t){const b=document.createElement('button'); b.className='chip'; b.textContent=t; return b}
+  function saveLS(k,v){localStorage.setItem(k,JSON.stringify(v))} function loadLS(k,fb){try{const v=localStorage.getItem(k); return v?JSON.parse(v):fb}catch(e){return fb}}
+
+  renderAll();
+})();</script>
+</body>
+</html>
